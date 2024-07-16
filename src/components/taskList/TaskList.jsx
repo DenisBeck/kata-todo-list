@@ -1,19 +1,24 @@
 import Task from "../task";
+import PropTypes from 'prop-types';
 
 import './TaskList.css';
 
-const TaskList = ({ todoTasks, onDeleteTask, onChangeStatus }) => {
+const TaskList = (props) => {
+    const { todoTasks, ...otherProps} = props
     return (
         <ul className="todo-list">
             {todoTasks.map(item => (
-                <Task 
+                <Task key={ item.id }
                     {...item} 
-                    onDeleteTask={ (id) => onDeleteTask(id) } 
-                    onChangeStatus={ (id, statusValue) => onChangeStatus(id, statusValue) } 
+                    {...otherProps}
                 />
             ))}
         </ul>
     )
+}
+
+TaskList.propTypes = {
+    todoTasks: PropTypes.array.isRequired
 }
 
 export default TaskList;

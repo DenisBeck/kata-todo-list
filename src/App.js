@@ -17,9 +17,9 @@ export default class App extends Component {
 
     this.state = {
       tasks: [
-        { id: '1', label: 'Completed task', created: formatDistanceToNow(new Date(2024, 6, 13, 17, 20)), status: 'complete' },
-        { id: '2', label: 'Editing task', created: formatDistanceToNow(new Date(2024, 6, 13, 17, 15)), status: 'editing' },
-        { id: '3', label: 'Active task', created: formatDistanceToNow(new Date(2024, 6, 13, 17, 15)), status: 'active' },
+        { id: '1', label: 'Completed task', created: formatDistanceToNow(new Date(2024, 6, 13, 17, 20)), status: 'complete', wasEdited: false },
+        { id: '2', label: 'Editing task', created: formatDistanceToNow(new Date(2024, 6, 13, 17, 15)), status: 'editing', wasEdited: false },
+        { id: '3', label: 'Active task', created: formatDistanceToNow(new Date(2024, 6, 13, 17, 15)), status: 'active', wasEdited: false },
       ],
       selectedTab: 'All'
     }
@@ -43,27 +43,40 @@ export default class App extends Component {
     }
 
     this.addTask = (text) => {
-      this.setState(({ tasks }) => {
+      this.setState((state) => {
+        const { tasks } = state;
         const newTask = {
           id: maxId++,
           label: text,
           created: formatDistanceToNow(new Date()),
           status: 'active'
         }
-
-        return {
-          tasks: [...tasks, newTask]
-        }
+        return { ...state, tasks: [ ...tasks, newTask ] }
       })
     }
 
     this.deleteTask = (id) => {
-      this.setState(({ tasks }) => {
+      this.setState((state) => {
+        const { tasks } = state;
         const newTasks = tasks.filter(item => Number(item.id) !== Number(id));
-        return {
-          tasks: newTasks
-        }
+        return { ...state, tasks: newTasks }
       });
+    }
+
+    this.editTask = (id, value) => {
+      this.setState((state) => {
+        const { tasks } = state;
+        const newTasks = tasks.map(item => {
+          if (Number(item.id) === Number(id)) {
+            item.label = value;
+            item.status = 'active';
+            item.created = formatDistanceToNow(new Date());
+            item.wasEdited = true;
+          }
+          return item;
+        })
+        return { ...state, tasks: newTasks }
+      })
     }
 
     this.deleteCompleted = () => {
@@ -76,29 +89,24 @@ export default class App extends Component {
     }
 
     this.changeStatus = (id, statusValue) => {
-      if (statusValue === 'editing') {
-        this.setState(({ tasks }) => { 
-          const notEditing = tasks.map(item => {
+      this.setState((state) => {
+        const { tasks } = state;
+
+        const changedTasks = tasks
+          .map(item => {
             if (item.status === 'editing') {
               item.status = 'active';
             }
             return item;
           })
-          return {
-            tasks: notEditing
-          }
-        })
-      }
-      this.setState(({ tasks }) => {
-        const changedTasks = tasks.map(item => {
-          if (Number(item.id) === Number(id)) {
-            item.status = statusValue;
-          }
-          return item;
-        });
-        return {
-          tasks: changedTasks
-        }
+          .map(item => {
+            if (Number(item.id) === Number(id)) {
+              item.status = statusValue;
+            }
+            return item;
+          });
+        
+        return { ...state, tasks: changedTasks }
       })
     }
   }
@@ -121,6 +129,7 @@ export default class App extends Component {
             todoTasks={ filteredTasks } 
             onDeleteTask={ this.deleteTask }
             onChangeStatus={ this.changeStatus }
+            onEditTask={ this.editTask }
           />
           <Footer 
             activeCount={ activeCount }
