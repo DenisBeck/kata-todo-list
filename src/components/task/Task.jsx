@@ -19,9 +19,7 @@ export default class Task extends Component {
     this.onSubmitHandler = (e) => {
       const { editingTask } = this.state;
       if (e.code === 'Enter' || e.type === 'blur') {
-        if (editingTask !== label) {
-          onEditTask(id, this.state.editingTask);
-        }
+        onEditTask(id, editingTask);
       }
     };
   }

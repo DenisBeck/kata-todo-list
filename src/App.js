@@ -84,10 +84,12 @@ export default class App extends Component {
         const { tasks } = state;
         const newTasks = tasks.map((item) => {
           if (Number(item.id) === Number(id)) {
-            item.label = value;
             item.status = 'active';
-            item.created = formatDistanceToNow(new Date());
-            item.wasEdited = true;
+            if (item.label !== value) {
+              item.label = value;
+              item.created = formatDistanceToNow(new Date());
+              item.wasEdited = true;
+            }
           }
           return item;
         });
