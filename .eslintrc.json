@@ -18,7 +18,8 @@
       "ecmaVersion": 12,
       "sourceType": "module"
     },
-    "plugins": ["react", "prettier", "import"],
+    "parser": "@babel/eslint-parser",
+    "plugins": ["react", "prettier", "import", "babel"],
     "rules": {
       "indent": ["error", 2, { "SwitchCase": 1 }],
       "prettier/prettier": ["error", { "endOfLine": "auto" }],
