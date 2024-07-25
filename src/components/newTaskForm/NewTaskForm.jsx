@@ -11,8 +11,6 @@ export default class NewTaskForm extends Component {
       task: '',
     };
 
-    const { task } = this.state;
-
     this.onChangeHandler = (e) => {
       this.setState({
         task: e.target.value,
@@ -20,6 +18,7 @@ export default class NewTaskForm extends Component {
     };
 
     this.onSubmitHandler = (e) => {
+      const { task } = this.state;
       if (e.code === 'Enter' && task) {
         onAddTask(task);
         this.setState({
