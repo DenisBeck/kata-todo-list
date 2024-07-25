@@ -24,31 +24,6 @@ export default class Task extends Component {
     };
   }
 
-  static defaultProps = {
-    wasEdited: false,
-    status: 'active',
-    onChangeStatus: () => {
-      alert('Task Status Is Not Changed');
-    },
-    onDeleteTask: () => {
-      alert('Task Is Not Removed');
-    },
-    onEditTask: () => {
-      alert('Task Cannot Be Edited');
-    },
-  };
-
-  static propTypes = {
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    label: PropTypes.string.isRequired,
-    created: PropTypes.string.isRequired,
-    wasEdited: PropTypes.bool,
-    status: PropTypes.oneOf(['active', 'editing', 'complete']),
-    onChangeStatus: PropTypes.func,
-    onDeleteTask: PropTypes.func,
-    onEditTask: PropTypes.func,
-  };
-
   render() {
     const { editingTask } = this.state;
 
@@ -75,8 +50,12 @@ export default class Task extends Component {
             <span className="description">{label}</span>
             <span className="created">{`${wasEdited ? 'edited' : 'created'} ${created} ago`}</span>
           </label>
-          <button className="icon icon-edit" onClick={() => onChangeStatus(id, 'editing')}></button>
-          <button className="icon icon-destroy" onClick={() => onDeleteTask(id)}></button>
+          <button type="button" className="icon icon-edit" onClick={() => onChangeStatus(id, 'editing')}>
+            {' '}
+          </button>
+          <button type="button" className="icon icon-destroy" onClick={() => onDeleteTask(id)}>
+            {' '}
+          </button>
         </div>
         {status === 'editing' && (
           <input
@@ -92,3 +71,28 @@ export default class Task extends Component {
     );
   }
 }
+
+Task.defaultProps = {
+  wasEdited: false,
+  status: 'active',
+  onChangeStatus: () => {
+    alert('Task Status Is Not Changed');
+  },
+  onDeleteTask: () => {
+    alert('Task Is Not Removed');
+  },
+  onEditTask: () => {
+    alert('Task Cannot Be Edited');
+  },
+};
+
+Task.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  label: PropTypes.string.isRequired,
+  created: PropTypes.string.isRequired,
+  wasEdited: PropTypes.bool,
+  status: PropTypes.oneOf(['active', 'editing', 'complete']),
+  onChangeStatus: PropTypes.func,
+  onDeleteTask: PropTypes.func,
+  onEditTask: PropTypes.func,
+};

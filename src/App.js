@@ -84,12 +84,14 @@ export default class App extends Component {
         const { tasks } = state;
         const newTasks = tasks.map((item) => {
           if (Number(item.id) === Number(id)) {
-            item.status = 'active';
+            const newItem = { ...item };
+            newItem.status = 'active';
             if (item.label !== value) {
-              item.label = value;
-              item.created = formatDistanceToNow(new Date());
-              item.wasEdited = true;
+              newItem.label = value;
+              newItem.created = formatDistanceToNow(new Date());
+              newItem.wasEdited = true;
             }
+            return newItem;
           }
           return item;
         });
@@ -114,13 +116,17 @@ export default class App extends Component {
         const changedTasks = tasks
           .map((item) => {
             if (item.status === 'editing') {
-              item.status = 'active';
+              const newItem = { ...item };
+              newItem.status = 'active';
+              return newItem;
             }
             return item;
           })
           .map((item) => {
             if (Number(item.id) === Number(id)) {
-              item.status = statusValue;
+              const newItem = { ...item };
+              newItem.status = statusValue;
+              return newItem;
             }
             return item;
           });

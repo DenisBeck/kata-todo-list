@@ -1,10 +1,11 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
 
 import Task from '../task';
 
 import './TaskList.css';
 
-const TaskList = (props) => {
+function TaskList(props) {
   const { todoTasks, ...otherProps } = props;
   return (
     <ul className="todo-list">
@@ -13,10 +14,10 @@ const TaskList = (props) => {
       ))}
     </ul>
   );
-};
+}
 
 TaskList.propTypes = {
-  todoTasks: PropTypes.array.isRequired,
+  todoTasks: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default TaskList;

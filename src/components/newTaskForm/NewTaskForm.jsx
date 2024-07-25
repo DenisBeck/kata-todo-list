@@ -1,24 +1,17 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import './NewTaskForm.css';
 
 export default class NewTaskForm extends Component {
-  static defaultProps = {
-    onAddTask: () => {
-      alert('New Task Is Not Added');
-    },
-  };
-
-  static propTypes = {
-    onAddTask: PropTypes.func,
-  };
-
   constructor({ onAddTask }) {
     super();
 
     this.state = {
       task: '',
     };
+
+    const { task } = this.state;
 
     this.onChangeHandler = (e) => {
       this.setState({
@@ -27,8 +20,8 @@ export default class NewTaskForm extends Component {
     };
 
     this.onSubmitHandler = (e) => {
-      if (e.code === 'Enter' && this.state.task) {
-        onAddTask(this.state.task);
+      if (e.code === 'Enter' && task) {
+        onAddTask(task);
         this.setState({
           task: '',
         });
@@ -37,15 +30,26 @@ export default class NewTaskForm extends Component {
   }
 
   render() {
+    const { task } = this.state;
     return (
       <input
         className="new-todo"
         placeholder="What needs to be done?"
         onChange={this.onChangeHandler}
         onKeyUp={this.onSubmitHandler}
-        value={this.state.task}
+        value={task}
         autoFocus
       />
     );
   }
 }
+
+NewTaskForm.defaultProps = {
+  onAddTask: () => {
+    alert('New Task Is Not Added');
+  },
+};
+
+NewTaskForm.propTypes = {
+  onAddTask: PropTypes.func,
+};

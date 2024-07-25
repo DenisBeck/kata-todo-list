@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import './TasksFilter.css';
 
-const TasksFilter = (props) => {
+function TasksFilter(props) {
   const { selectedTab, onSelectTab } = props;
 
   const tabs = [
@@ -14,16 +14,21 @@ const TasksFilter = (props) => {
     <ul className="filters">
       {tabs.map((item) => (
         <li key={item.id}>
-          <button className={item.title === selectedTab ? 'selected' : null} onClick={() => onSelectTab(item.title)}>
+          <button
+            type="button"
+            className={item.title === selectedTab ? 'selected' : null}
+            onClick={() => onSelectTab(item.title)}
+          >
             {item.title}
           </button>
         </li>
       ))}
     </ul>
   );
-};
+}
 
 TasksFilter.defaultProps = {
+  selectedTab: 'All',
   onSelectTab: () => {
     alert('Selected Tasks cannot Be Shown');
   },
