@@ -60,16 +60,34 @@ li .toggle:checked + label {
 li label {
 	display: flex;
 	align-items: center;
+	gap: 10px;
 	justify-content: space-between;
+	white-space: nowrap;
+	vertical-align: middle;
 	padding: 15px 85px 15px 60px;
 }
 
-li label .created {
+li .view {
+	position: relative;
+}
+
+li label .created,
+li label .description {
 	font-size: 13px;
 	color: gray;
 }
 
 li label .description {
+	display: flex;
+	align-items: center;
+	flex: auto;
+	gap: 15px
+}
+
+li label .title {
+	width: 220px;
+	text-overflow: ellipsis;
+	overflow: hidden;
 	word-break: break-all;
 	display: block;
 	line-height: 1.2;
@@ -78,29 +96,30 @@ li label .description {
 	color: #4d4d4d;
 }
 
-li.completed label .description {
+li.completed label .title {
 	color: #cdcdcd;
 	text-decoration: line-through;
 }
 
 li .icon {
-	position: absolute;
-	top: 0;
-	bottom: -3px;
 	width: 30px;
 	height: 40px;
 	font-size: 34px;
 	color: #cc9a9a;
-	margin: auto 0 11px;
+	margin: auto;
 	transition: color 0.2s ease-out;
 	cursor: pointer;
 }
 
-li .icon:hover {
+li .icon:not(.disabled):hover,
+li .icon.active:not(.disabled) {
 	color: #af5b5e;
 }
 
 li .icon-destroy {
+	position: absolute;
+	top: 0;
+	bottom: -3px;
 	right: 10px;
 }
 
@@ -109,12 +128,40 @@ li .icon-destroy:after {
 }
 
 li .icon-edit {
+	position: absolute;
+	top: 0;
+	bottom: -3px;
 	font-size: 19px;
 	right: 45px;
 }
 
 li .icon-edit:after {
 	content: '✎';
+}
+
+li .icon-pause,
+li .icon-play {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	margin: auto 0 5px;
+}
+
+li .icon-pause {
+	margin-top: -5px;
+	margin-left: -5px;
+}
+
+li .icon-play {
+	font-size: 15px;
+}
+
+.icon-pause:after {
+	content: '⏸';
+}
+
+.icon-play:after {
+	content: '▶';
 }
 
 li .edit {
