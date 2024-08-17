@@ -13,7 +13,7 @@ export default class Task extends Component {
     this.state = {
       prevLabel: label,
       editingTask: label,
-      isPlaying: false,
+      isPlaying: true,
     };
 
     this.inputRef = createRef();
@@ -55,11 +55,35 @@ export default class Task extends Component {
         isPlaying: false,
       });
     };
+
+    this.setTimer = () => {
+      const { isPlaying } = this.state;
+      const { seconds, status } = this.props;
+
+      clearTimeout(this.timer);
+      this.timer = null;
+
+      if (isPlaying && seconds > 0 && status === 'active') {
+        this.timer = setTimeout(() => {
+          const sec = seconds - 1;
+          onEditTask(
+            id,
+            {
+              seconds: sec,
+            },
+            false
+          );
+        }, 1000);
+      }
+    };
+  }
+
+  componentDidMount() {
+    this.setTimer();
   }
 
   componentDidUpdate(prevProps) {
-    const { id, label, seconds, status, onEditTask } = this.props;
-    const { isPlaying } = this.state;
+    const { label, status } = this.props;
 
     if (label !== prevProps.label || status !== prevProps.status) {
       this.setState({
@@ -68,21 +92,7 @@ export default class Task extends Component {
       });
     }
 
-    clearTimeout(this.timer);
-    this.timer = null;
-
-    if (isPlaying && seconds > 0 && status === 'active') {
-      this.timer = setTimeout(() => {
-        const sec = seconds - 1;
-        onEditTask(
-          id,
-          {
-            seconds: sec,
-          },
-          false
-        );
-      }, 1000);
-    }
+    this.setTimer();
 
     if (this.inputRef.current) {
       this.inputRef.current.focus();
