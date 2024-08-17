@@ -1,5 +1,9 @@
-import { Component } from 'react';
+/* eslint-disable react/no-did-update-set-state */
+import { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
+
+import Timer from '../timer/Timer';
+
 import './Task.css';
 
 export default class Task extends Component {
@@ -7,9 +11,12 @@ export default class Task extends Component {
     super();
 
     this.state = {
+      prevLabel: label,
       editingTask: label,
       isPlaying: false,
     };
+
+    this.inputRef = createRef();
 
     this.onChangeHandler = (e) => {
       this.setState({
@@ -17,20 +24,23 @@ export default class Task extends Component {
       });
     };
 
-    this.onSubmitHandler = (e) => {
+    this.onChangeStatusHandler = () => {
+      onChangeStatus(id, 'editing');
+    };
+
+    this.submitEditing = () => {
       const { editingTask } = this.state;
-      if (e.code === 'Enter' || e.type === 'blur') {
-        if (label === editingTask) {
-          onChangeStatus(id, 'active');
-        } else {
-          onEditTask(id, { label: editingTask });
-        }
-      }
-      if (e.code === 'Escape') {
-        onChangeStatus(id, 'active');
-        this.setState({
-          editingTask: label,
-        });
+      onEditTask(id, { label: editingTask }, true);
+    };
+    this.resetEditing = () => {
+      const { prevLabel } = this.state;
+      onEditTask(id, { label: prevLabel }, false);
+    };
+    this.onSubmitHandler = (e) => {
+      if (e.code === 'Escape' || e.type === 'blur') {
+        this.resetEditing();
+      } else if (e.code === 'Enter') {
+        this.submitEditing();
       }
     };
 
@@ -47,23 +57,35 @@ export default class Task extends Component {
     };
   }
 
-  componentDidUpdate() {
-    const { id, minutes, seconds, status, onEditTask } = this.props;
+  componentDidUpdate(prevProps) {
+    const { id, label, seconds, status, onEditTask } = this.props;
     const { isPlaying } = this.state;
+
+    if (label !== prevProps.label || status !== prevProps.status) {
+      this.setState({
+        prevLabel: prevProps.label,
+        editingTask: label,
+      });
+    }
 
     clearTimeout(this.timer);
     this.timer = null;
-    let secondsCount = minutes * 60 + Number(seconds);
 
-    if (isPlaying && secondsCount > 0 && status !== 'complete') {
+    if (isPlaying && seconds > 0 && status === 'active') {
       this.timer = setTimeout(() => {
-        secondsCount--;
-        const sec = String(secondsCount % 60);
-        onEditTask(id, {
-          minutes: String(Math.floor(secondsCount / 60)),
-          seconds: sec.length < 2 ? `0${sec}` : sec,
-        });
+        const sec = seconds - 1;
+        onEditTask(
+          id,
+          {
+            seconds: sec,
+          },
+          false
+        );
       }, 1000);
+    }
+
+    if (this.inputRef.current) {
+      this.inputRef.current.focus();
     }
   }
 
@@ -74,62 +96,47 @@ export default class Task extends Component {
   render() {
     const { editingTask, isPlaying } = this.state;
 
-    const { id, label, minutes, seconds, status, created, wasEdited, onChangeStatus, onDeleteTask } = this.props;
+    const { id, label, seconds, status, created, wasEdited, onChangeStatus, onDeleteTask, selectedTab } = this.props;
 
-    let statusClass = null;
-    if (status === 'complete') {
-      statusClass = 'completed';
-    } else if (status === 'editing') {
-      statusClass = 'editing';
+    if ((selectedTab === 'Active' && status !== 'active') || (selectedTab === 'Completed' && status !== 'completed')) {
+      return <li />;
     }
 
     return (
-      <li className={statusClass}>
+      <li className={status}>
         <div className="view">
           <input
             id={id}
             className="toggle"
             type="checkbox"
-            checked={status === 'complete'}
-            onChange={() => onChangeStatus(id, status === 'complete' ? 'active' : 'complete')}
+            checked={status === 'completed'}
+            onChange={() => onChangeStatus(id, status === 'completed' ? 'active' : 'completed')}
           />
           <label htmlFor={id}>
             <span className="title">{label}</span>
-            <span className="description">
-              <button
-                type="button"
-                className={`icon icon-play ${status === 'complete' && 'disabled'} ${isPlaying && 'active'}`}
-                onClick={() => this.onPlayTimer()}
-                disabled={status === 'complete'}
-                aria-label="play"
-              />
-              <button
-                type="button"
-                className={`icon icon-pause ${status === 'complete' && 'disabled'} ${!isPlaying && 'active'}`}
-                onClick={() => this.onPauseTimer()}
-                disabled={status === 'complete'}
-                aria-label="pause"
-              />
-              {`${minutes}:${seconds}`}
-            </span>
+            <Timer
+              isPlaying={isPlaying}
+              seconds={status === 'completed' ? 0 : seconds}
+              status={status}
+              onPauseTimer={this.onPauseTimer}
+              onPlayTimer={this.onPlayTimer}
+            />
             <span className="created">{`${wasEdited ? 'edited' : 'created'} ${created} ago`}</span>
           </label>
-          <button
-            type="button"
-            className="icon icon-edit"
-            onClick={() => onChangeStatus(id, 'editing')}
-            aria-label="edit"
-          />
+          <button type="button" className="icon icon-edit" onClick={this.onChangeStatusHandler} aria-label="edit" />
           <button type="button" className="icon icon-destroy" onClick={() => onDeleteTask(id)} aria-label="destroy" />
         </div>
         {status === 'editing' && (
           <input
+            ref={this.inputRef}
             type="text"
             className="edit"
             onChange={this.onChangeHandler}
             onKeyUp={this.onSubmitHandler}
             onBlur={this.onSubmitHandler}
             value={editingTask}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
           />
         )}
       </li>
@@ -156,7 +163,7 @@ Task.propTypes = {
   label: PropTypes.string.isRequired,
   created: PropTypes.string.isRequired,
   wasEdited: PropTypes.bool,
-  status: PropTypes.oneOf(['active', 'editing', 'complete']),
+  status: PropTypes.oneOf(['active', 'editing', 'completed']),
   onChangeStatus: PropTypes.func,
   onDeleteTask: PropTypes.func,
   onEditTask: PropTypes.func,

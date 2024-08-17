@@ -18,17 +18,15 @@ export default class App extends Component {
         {
           id: '1',
           label: 'Completed task',
-          minutes: '12',
-          seconds: '25',
+          seconds: 12 * 60 + 25,
           created: formatDistanceToNow(new Date(2024, 6, 13, 17, 20), { includeSeconds: true }),
-          status: 'complete',
+          status: 'completed',
           wasEdited: false,
         },
         {
           id: '2',
           label: 'Editing task',
-          minutes: '12',
-          seconds: '25',
+          seconds: 12 * 60 + 25,
           created: formatDistanceToNow(new Date(2024, 6, 13, 17, 15), { includeSeconds: true }),
           status: 'editing',
           wasEdited: false,
@@ -36,8 +34,7 @@ export default class App extends Component {
         {
           id: '3',
           label: 'Active task',
-          minutes: '12',
-          seconds: '25',
+          seconds: 12 * 60 + 25,
           created: formatDistanceToNow(new Date(2024, 6, 13, 17, 15), { includeSeconds: true }),
           status: 'active',
           wasEdited: false,
@@ -46,32 +43,17 @@ export default class App extends Component {
       selectedTab: 'All',
     };
 
-    this.getFilteredTasks = (state) => {
-      const { tasks, selectedTab } = state;
-      return tasks.filter((item) => {
-        switch (selectedTab) {
-          case 'All':
-            return true;
-          case 'Completed':
-            return item.status === 'complete';
-          default:
-            return item.status !== 'complete';
-        }
-      });
-    };
-
     this.selectTab = (title) => {
       this.setState({ selectedTab: title });
     };
 
-    this.addTask = (task) => {
+    this.addTask = ({ label, minutes, seconds }) => {
       this.setState((state) => {
         const { tasks } = state;
         const newTask = {
           id: maxId++,
-          label: task.label,
-          minutes: String(+task.minutes),
-          seconds: task.seconds.length < 2 ? `0${task.seconds}` : String(+task.seconds),
+          label,
+          seconds: minutes * 60 + +seconds,
           created: formatDistanceToNow(new Date(), { includeSeconds: true }),
           status: 'active',
         };
@@ -82,21 +64,24 @@ export default class App extends Component {
     this.deleteTask = (id) => {
       this.setState((state) => {
         const { tasks } = state;
-        const newTasks = tasks.filter((item) => Number(item.id) !== Number(id));
+        const newTasks = tasks.filter((item) => item.id !== id);
         return { ...state, tasks: newTasks };
       });
     };
 
-    this.editTask = (id, valueObject) => {
+    this.editTask = (id, valueObject, isCreatedChanged) => {
       this.setState((state) => {
         const { tasks } = state;
         const newTasks = tasks.map((item) => {
-          if (Number(item.id) === Number(id)) {
-            const newItem = { ...item, ...valueObject };
-            if (Object.prototype.hasOwnProperty.call(valueObject, 'label')) {
-              newItem.created = formatDistanceToNow(new Date());
-              newItem.wasEdited = true;
-            }
+          if (item.id === id) {
+            const { created } = item;
+            const newItem = {
+              ...item,
+              ...valueObject,
+              created: isCreatedChanged ? formatDistanceToNow(new Date()) : created,
+              wasEdited: isCreatedChanged,
+              status: 'active',
+            };
             return newItem;
           }
           return item;
@@ -144,7 +129,6 @@ export default class App extends Component {
 
   render() {
     const { selectedTab, tasks } = this.state;
-    const filteredTasks = this.getFilteredTasks(this.state);
     const activeCount = tasks.filter((item) => item.status !== 'complete').length;
 
     return (
@@ -155,7 +139,8 @@ export default class App extends Component {
         </header>
         <section className="main">
           <TaskList
-            todoTasks={filteredTasks}
+            todoTasks={tasks}
+            selectedTab={selectedTab}
             onDeleteTask={this.deleteTask}
             onChangeStatus={this.changeStatus}
             onEditTask={this.editTask}
