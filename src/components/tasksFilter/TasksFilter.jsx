@@ -1,9 +1,6 @@
-import PropTypes from 'prop-types';
 import './TasksFilter.css';
 
-function TasksFilter(props) {
-  const { selectedTab, onSelectTab } = props;
-
+function TasksFilter({ selectedTab, onSelectTab }) {
   const tabs = [
     { id: '1', title: 'All' },
     { id: '2', title: 'Active' },
@@ -26,17 +23,5 @@ function TasksFilter(props) {
     </ul>
   );
 }
-
-TasksFilter.defaultProps = {
-  selectedTab: 'All',
-  onSelectTab: () => {
-    alert('Selected Tasks cannot Be Shown');
-  },
-};
-
-TasksFilter.propTypes = {
-  onSelectTab: PropTypes.func,
-  selectedTab: PropTypes.oneOf(['All', 'Active', 'Completed']),
-};
 
 export default TasksFilter;

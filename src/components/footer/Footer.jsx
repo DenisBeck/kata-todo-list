@@ -1,6 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import PropTypes from 'prop-types';
-
 import TasksFilter from '../tasksFilter';
 
 import './Footer.css';
@@ -17,16 +15,5 @@ function Footer(props) {
     </footer>
   );
 }
-
-Footer.defaultProps = {
-  onDeleteCompleted: () => {
-    alert('Completed Tasks cannot Be Removed');
-  },
-};
-
-Footer.propTypes = {
-  activeCount: PropTypes.number.isRequired,
-  onDeleteCompleted: PropTypes.func,
-};
 
 export default Footer;
