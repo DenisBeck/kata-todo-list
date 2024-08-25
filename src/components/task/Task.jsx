@@ -22,8 +22,6 @@ function Task({
 
   const inputRef = createRef(null);
 
-  // let timerId = null;
-
   const onChangeHandler = (e) => {
     setEditingLabel(e.target.value);
   };
@@ -32,12 +30,16 @@ function Task({
     onChangeStatus(id, 'editing');
   };
 
-  const submitEditing = () => {
-    onEditTask(id, { label: editingLabel }, true);
-  };
   const resetEditing = () => {
     setEditingLabel(label);
     onEditTask(id, { label }, false);
+  };
+  const submitEditing = () => {
+    if (editingLabel === '') {
+      resetEditing();
+    } else {
+      onEditTask(id, { label: editingLabel }, true);
+    }
   };
   const onSubmitHandler = (e) => {
     if (e.code === 'Escape' || e.type === 'blur') {
