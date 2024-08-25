@@ -35,7 +35,7 @@ function Task({
     onEditTask(id, { label }, false);
   };
   const submitEditing = () => {
-    if (editingLabel === '') {
+    if (editingLabel.trim() === '') {
       resetEditing();
     } else {
       onEditTask(id, { label: editingLabel }, true);
